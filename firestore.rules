@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isRole(role) {
+        return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    function isCarWashOwner(carWashId) {
+      let carWash = get(/databases/$(database)/documents/carWashes/$(carWashId));
+      return isSignedIn() && carWash.data.ownerId == request.auth.uid;
+    }
+
+    // Users Collection
+    // - Only the user themselves can read or update their own profile.
+    // - Admins can read any user profile.
+    match /users/{userId} {
+      allow read, update: if isOwner(userId);
+      allow get: if isRole('admin');
+      allow create: if isOwner(userId);
+      // No one can list all users or delete a user.
+      allow list, delete: if false;
+    }
+
+    // CarWashes Collection
+    // - Anyone can read car wash listings.
+    // - Only the owner of the car wash can update it.
+    // - A user with the 'owner' role can create a new car wash.
+    match /carWashes/{carWashId} {
+      allow get, list: if true;
+      allow create: if isRole('owner') && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isCarWashOwner(carWashId);
+      // Deletion can be handled by admins or owners.
+      allow delete: if isCarWashOwner(carWashId) || isRole('admin');
+    }
+
+    // Bookings Collection
+    // - Clients can create bookings for themselves.
+    // - A booking can be read or modified by the client who made it or the owner of the car wash.
+    match /bookings/{bookingId} {
+      allow create: if isOwner(request.resource.data.clientId);
+      allow get, update: if isOwner(resource.data.clientId) || isCarWashOwner(resource.data.carWashId);
+      // Listing all bookings might be restricted to admins or specific backend processes.
+      allow list: if isRole('admin');
+      allow delete: if false; // Status should be changed to 'cancelled' instead.
+    }
+    
+    // Reviews Collection
+    // - A client can only create a review for a booking they have completed.
+    // - Anyone can read reviews.
+    // - Only the author can edit their own review.
+    match /reviews/{reviewId} {
+        allow get, list: if true;
+        allow create: if isOwner(request.resource.data.clientId) &&
+                       exists(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}) &&
+                       get(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}).data.clientId == request.auth.uid &&
+                       get(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}).data.status == 'completed';
+        allow update: if isOwner(resource.data.clientId);
+        // Deletion can be handled by the author or an admin.
+        allow delete: if isOwner(resource.data.clientId) || isRole('admin');
+    }
+  }
+}

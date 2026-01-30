@@ -1,0 +1,99 @@
+{
+  "users": [
+    {
+      "uid": "client_user_1",
+      "name": "João Cliente",
+      "email": "joao.cliente@example.com",
+      "role": "client",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "uid": "owner_user_1",
+      "name": "Maria Proprietária",
+      "email": "maria.proprietaria@example.com",
+      "role": "owner",
+      "createdAt": "2024-01-10T09:00:00Z",
+      "updatedAt": "2024-01-12T14:30:00Z"
+    },
+    {
+      "uid": "admin_user_1",
+      "name": "Admin Geral",
+      "email": "admin@washwise.com",
+      "role": "admin",
+      "createdAt": "2024-01-01T08:00:00Z",
+      "updatedAt": "2024-01-01T08:00:00Z"
+    }
+  ],
+  "carWashes": [
+    {
+      "id": "cw_1",
+      "ownerId": "owner_user_1",
+      "name": "Lava-Rápido Água Brilhante",
+      "description": "O melhor cuidado para o seu carro, com produtos de alta qualidade.",
+      "address": "Rua das Flores, 123, São Paulo, SP",
+      "coordinates": { "lat": -23.55052, "lng": -46.633308 },
+      "geohash": "6gycfx7",
+      "images": ["url_img_1.jpg", "url_img_2.jpg"],
+      "services": [
+        { "id": "serv_1", "name": "Lavagem Simples", "price": 40, "duration": 30 },
+        { "id": "serv_2", "name": "Lavagem Completa com Cera", "price": 80, "duration": 60 }
+      ],
+      "rating": 4.8,
+      "reviewCount": 75,
+      "createdAt": "2024-01-11T11:00:00Z",
+      "updatedAt": "2024-01-18T16:45:00Z"
+    },
+    {
+      "id": "cw_2",
+      "ownerId": "another_owner_id",
+      "name": "Eco Wash SP",
+      "description": "Lavagem ecológica com economia de água.",
+      "address": "Avenida Paulista, 1578, São Paulo, SP",
+      "coordinates": { "lat": -23.5613, "lng": -46.6565 },
+      "geohash": "6gycfw2",
+      "images": ["url_img_3.jpg"],
+      "services": [
+        { "id": "serv_3", "name": "Lavagem a Seco", "price": 50, "duration": 45 },
+        { "id": "serv_4", "name": "Higienização Interna", "price": 120, "duration": 90 }
+      ],
+      "rating": 4.5,
+      "reviewCount": 42,
+      "createdAt": "2024-02-01T10:00:00Z",
+      "updatedAt": "2024-02-05T12:00:00Z"
+    }
+  ],
+  "bookings": [
+    { "id": "booking_1", "clientId": "client_user_1", "carWashId": "cw_1", "serviceId": "serv_2", "date": "2024-03-10", "time": "14:00", "status": "completed", "createdAt": "2024-03-01T18:00:00Z" },
+    { "id": "booking_2", "clientId": "client_user_1", "carWashId": "cw_2", "serviceId": "serv_3", "date": "2024-03-12", "time": "10:00", "status": "confirmed", "createdAt": "2024-03-05T11:20:00Z" },
+    { "id": "booking_3", "clientId": "another_client_id", "carWashId": "cw_1", "serviceId": "serv_1", "date": "2024-03-11", "time": "09:00", "status": "confirmed", "createdAt": "2024-03-08T09:05:00Z" },
+    { "id": "booking_4", "clientId": "client_user_1", "carWashId": "cw_1", "serviceId": "serv_1", "date": "2024-02-20", "time": "16:00", "status": "cancelled", "createdAt": "2024-02-15T14:00:00Z" },
+    { "id": "booking_5", "clientId": "another_client_id", "carWashId": "cw_2", "serviceId": "serv_4", "date": "2024-03-15", "time": "11:00", "status": "pending", "createdAt": "2024-03-10T20:00:00Z" }
+  ],
+  "reviews": [
+    {
+      "id": "review_1",
+      "clientId": "client_user_1",
+      "carWashId": "cw_1",
+      "rating": 5,
+      "comment": "Serviço excelente, meu carro ficou impecável!",
+      "createdAt": "2024-03-10T15:30:00Z"
+    },
+    {
+      "id": "review_2",
+      "clientId": "another_client_id",
+      "carWashId": "cw_1",
+      "rating": 4,
+      "comment": "Bom atendimento, mas demorou um pouco mais que o esperado.",
+      "createdAt": "2024-03-05T11:00:00Z"
+    },
+    {
+      "id": "review_3",
+      "clientId": "client_user_1",
+      "carWashId": "cw_2",
+      "rating": 5,
+      "comment": "Ótima lavagem a seco, recomendo!",
+      "createdAt": "2024-03-12T11:00:00Z"
+    }
+  ]
+}

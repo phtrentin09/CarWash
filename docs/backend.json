@@ -1,0 +1,195 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "type": "object",
+      "description": "Representa um usuário do aplicativo, que pode ser um cliente, dono de lava-rápido ou administrador.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "O ID único do usuário, fornecido pelo Firebase Authentication."
+        },
+        "name": {
+          "type": "string",
+          "description": "O nome completo do usuário."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "O endereço de e-mail do usuário."
+        },
+        "role": {
+          "type": "string",
+          "description": "A função do usuário no sistema.",
+          "enum": ["client", "owner", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp de quando o usuário foi criado."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp da última atualização do perfil do usuário."
+        }
+      },
+      "required": ["uid", "name", "email", "role", "createdAt", "updatedAt"]
+    },
+    "CarWash": {
+      "title": "CarWash",
+      "type": "object",
+      "description": "Representa um lava-rápido cadastrado no sistema.",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "O UID do usuário (dono) proprietário deste lava-rápido."
+        },
+        "name": {
+          "type": "string",
+          "description": "O nome comercial do lava-rápido."
+        },
+        "description": {
+          "type": "string",
+          "description": "Uma breve descrição sobre o lava-rápido."
+        },
+        "address": {
+          "type": "string",
+          "description": "O endereço físico do lava-rápido."
+        },
+        "coordinates": {
+          "type": "object",
+          "description": "As coordenadas geográficas do lava-rápido.",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "geohash": {
+          "type": "string",
+          "description": "O geohash correspondente às coordenadas para buscas de proximidade."
+        },
+        "images": {
+          "type": "array",
+          "description": "Uma lista de URLs das imagens do lava-rápido.",
+          "items": { "type": "string" }
+        },
+        "services": {
+          "type": "array",
+          "description": "Os serviços oferecidos pelo lava-rápido.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "price": { "type": "number" },
+              "duration": { "type": "number", "description": "Duração do serviço em minutos." }
+            }
+          }
+        },
+        "rating": {
+          "type": "number",
+          "description": "A classificação média do lava-rápido (0 a 5)."
+        },
+        "reviewCount": {
+          "type": "number",
+          "description": "O número total de avaliações recebidas."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "name", "address", "coordinates", "geohash", "createdAt", "updatedAt"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "type": "object",
+      "description": "Representa um agendamento de serviço feito por um cliente.",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "O UID do cliente que fez o agendamento."
+        },
+        "carWashId": {
+          "type": "string",
+          "description": "O ID do lava-rápido onde o serviço foi agendado."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "O ID do serviço agendado."
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "A data do agendamento."
+        },
+        "time": {
+          "type": "string",
+          "format": "time",
+          "description": "A hora do agendamento."
+        },
+        "status": {
+          "type": "string",
+          "description": "O status atual do agendamento.",
+          "enum": ["pending", "confirmed", "cancelled", "completed"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["clientId", "carWashId", "serviceId", "date", "time", "status", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "type": "object",
+      "description": "Representa uma avaliação feita por um cliente sobre um serviço.",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "O UID do cliente que escreveu a avaliação."
+        },
+        "carWashId": {
+          "type": "string",
+          "description": "O ID do lava-rápido que está sendo avaliado."
+        },
+        "rating": {
+          "type": "number",
+          "description": "A nota da avaliação (1 a 5)."
+        },
+        "comment": {
+          "type": "string",
+          "description": "O comentário da avaliação."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["clientId", "carWashId", "rating", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Armazena os perfis de todos os usuários."
+    },
+    "/carWashes/{carWashId}": {
+      "schema": { "$ref": "#/entities/CarWash" },
+      "description": "Armazena os perfis públicos dos lava-rápidos."
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Coleção principal para todos os agendamentos."
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Coleção principal para todas as avaliações."
+    }
+  }
+}

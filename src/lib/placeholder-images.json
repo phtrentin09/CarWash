@@ -1,0 +1,28 @@
+{
+  "placeholderImages": [
+    {
+      "id": "carwash-1",
+      "description": "Exterior of a modern car wash facility.",
+      "imageUrl": "https://images.unsplash.com/photo-1611239179213-d972da54091a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjYXIlMjB3YXNofGVufDB8fHx8MTc2OTU1MTMxOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "car wash"
+    },
+    {
+      "id": "carwash-2",
+      "description": "A clean car shining in the sun.",
+      "imageUrl": "https://images.unsplash.com/photo-1444947295498-07f60c19a4ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjbGVhbiUyMGNhcnxlbnwwfHx8fDE3Njk1NTM5NTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "clean car"
+    },
+    {
+      "id": "carwash-3",
+      "description": "Soap suds covering a car during a wash.",
+      "imageUrl": "https://images.unsplash.com/photo-1616888539876-ae3b6237b64f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzb2FwJTIwc3Vkc3xlbnwwfHx8fDE3Njk1NTgxODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "soap suds"
+    },
+    {
+      "id": "carwash-4",
+      "description": "A closed sign on a business door.",
+      "imageUrl": "https://images.unsplash.com/photo-1498811008858-d95a730b2ffc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjbG9zZWQlMjBzaWdufGVufDB8fHx8MTc2OTQ4OTg0MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "closed sign"
+    }
+  ]
+}
