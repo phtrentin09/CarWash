@@ -1,19 +1,24 @@
 import { Timestamp } from "firebase/firestore";
 
+// 🔥 Unificado: AppUser e User agora são uma só estrutura
 export interface User {
   uid: string;
   name: string;
   email: string;
-  role: 'client' | 'owner' | 'admin';
-  createdAt: Date | Timestamp;
-  updatedAt: Date | Timestamp;
+  // Combinamos os roles: 'client' do AppUser e 'owner'/'admin' do original
+  role: 'client' | 'business' | 'owner' | 'admin'; 
+  
+  // No Firestore, usamos Timestamp para gravar e Date para ler no Front.
+  // O tipo 'number' (Date.now()) também é uma opção válida.
+  createdAt: Date | Timestamp | number;
+  updatedAt: Date | Timestamp | number;
 }
 
 export interface CarWashService {
   id: string;
   name: string;
   price: number;
-  duration: number; // in minutes
+  duration: number; // em minutos
 }
 
 export interface OperatingHours {
@@ -38,10 +43,10 @@ export interface CarWash {
   operatingHours: OperatingHours[];
   rating: number;
   reviewCount: number;
-  waitTime: number; // in minutes
+  waitTime: number; // em minutos
   isOpen: boolean;
-  createdAt: Date | Timestamp;
-  updatedAt: Date | Timestamp;
+  createdAt: Date | Timestamp | number;
+  updatedAt: Date | Timestamp | number;
 }
 
 export interface Booking {
@@ -55,7 +60,7 @@ export interface Booking {
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  createdAt: Date | Timestamp;
+  createdAt: Date | Timestamp | number;
 }
 
 export interface Review {
@@ -66,5 +71,5 @@ export interface Review {
   bookingId: string;
   rating: number;
   comment: string;
-  createdAt: Date | Timestamp;
+  createdAt: Date | Timestamp | number;
 }

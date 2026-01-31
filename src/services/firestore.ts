@@ -1,24 +1,20 @@
-import { db } from "../lib/firebase";
-import { collection, doc, getDoc, getDocs, setDoc, deleteDoc } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-export async function getCollection(name: string) {
-  const snapshot = await getDocs(collection(db, name));
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+};
 
-export async function getDocument(path: string) {
-  const ref = doc(db, path);
-  const snap = await getDoc(ref);
-  return snap.exists() ? snap.data() : null;
-}
+// 🛑 Impede múltiplas inicializações (CORREÇÃO DO ERRO)
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-export async function setDocument(path: string, data: any) {
-  const ref = doc(db, path);
-  return setDoc(ref, data, { merge: true });
-}
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-export async function deleteDocument(path: string) {
-  const ref = doc(db, path);
-  return deleteDoc(ref);
-}
 
