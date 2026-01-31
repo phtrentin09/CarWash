@@ -36,7 +36,7 @@ service cloud.firestore {
     // - Only the owner of the car wash can update it.
     // - A user with the 'owner' role can create a new car wash.
     match /carWashes/{carWashId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isRole('owner') && request.resource.data.ownerId == request.auth.uid;
       allow update: if isCarWashOwner(carWashId);
       // Deletion can be handled by admins or owners.
