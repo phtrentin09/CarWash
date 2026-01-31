@@ -63,7 +63,7 @@ export function OwnerDashboard() {
   const carWashesQuery = useMemoFirebase(
     () =>
       user && firestore
-        ? query(collection(firestore, 'carWashes'), where('ownerId', '==', user.uid))
+        ? query(collection(firestore, 'car_washes'), where('ownerId', '==', user.uid))
         : null,
     [user, firestore]
   );
@@ -85,7 +85,7 @@ export function OwnerDashboard() {
     if (!firestore || !ownerBusiness) return;
     setIsSaving(true);
     try {
-      const carWashRef = doc(firestore, 'carWashes', ownerBusiness.id);
+      const carWashRef = doc(firestore, 'car_washes', ownerBusiness.id);
       await updateDoc(carWashRef, {
         waitTime,
         isOpen,
