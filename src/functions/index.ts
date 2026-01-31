@@ -78,5 +78,5 @@ export const updateCarWashRating = async (carWashId) => {
   // Logic to:
   // 1. Query all reviews for the given carWashId.
   // 2. Calculate the new average rating and review count.
-  // 3. Update the corresponding document in the /carWashes collection.
+  // 3. Update the corresponding document in the /car_washes collection.
 };

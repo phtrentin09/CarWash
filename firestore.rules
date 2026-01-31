@@ -12,11 +12,15 @@ service cloud.firestore {
     }
     
     function isRole(role) {
-        return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    function isClient() {
+      return isRole('client');
     }
 
     function isCarWashOwner(carWashId) {
-      let carWash = get(/databases/$(database)/documents/carWashes/$(carWashId));
+      let carWash = get(/databases/$(database)/documents/car_washes/$(carWashId));
       return isSignedIn() && carWash.data.ownerId == request.auth.uid;
     }
 
@@ -31,42 +35,31 @@ service cloud.firestore {
       allow list, delete: if false;
     }
 
-    // CarWashes Collection
+    // Car Washes Collection (car_washes)
     // - Anyone can read car wash listings.
     // - Only the owner of the car wash can update it.
-    // - A user with the 'owner' role can create a new car wash.
-    match /carWashes/{carWashId} {
-      allow read: if true;
-      allow create: if isRole('owner') && request.resource.data.ownerId == request.auth.uid;
+    match /car_washes/{carWashId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update: if isCarWashOwner(carWashId);
-      // Deletion can be handled by admins or owners.
-      allow delete: if isCarWashOwner(carWashId) || isRole('admin');
-    }
+      allow delete: if false; // Soft deletes should be used.
 
-    // Bookings Collection
-    // - Clients can create bookings for themselves.
-    // - A booking can be read or modified by the client who made it or the owner of the car wash.
-    match /bookings/{bookingId} {
-      allow create: if isOwner(request.resource.data.clientId);
-      allow get, update: if isOwner(resource.data.clientId) || isCarWashOwner(resource.data.carWashId);
-      // Listing all bookings might be restricted to admins or specific backend processes.
-      allow list: if isRole('admin');
-      allow delete: if false; // Status should be changed to 'cancelled' instead.
-    }
-    
-    // Reviews Collection
-    // - A client can only create a review for a booking they have completed.
-    // - Anyone can read reviews.
-    // - Only the author can edit their own review.
-    match /reviews/{reviewId} {
+      match /reviews/{reviewId} {
         allow get, list: if true;
-        allow create: if isOwner(request.resource.data.clientId) &&
-                       exists(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}) &&
-                       get(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}).data.clientId == request.auth.uid &&
-                       get(/databases/$(database)/documents/bookings/{request.resource.data.bookingId}).data.status == 'completed';
-        allow update: if isOwner(resource.data.clientId);
-        // Deletion can be handled by the author or an admin.
-        allow delete: if isOwner(resource.data.clientId) || isRole('admin');
+        allow create: if isClient() &&
+          exists(/databases/$(database)/documents/car_washes/$(carWashId)/bookings/$(request.resource.data.bookingId)) &&
+          get(/databases/$(database)/documents/car_washes/$(carWashId)/bookings/$(request.resource.data.bookingId)).data.clientId == request.auth.uid &&
+          get(/databases/$(database)/documents/car_washes/$(carWashId)/bookings/$(request.resource.data.bookingId)).data.status == 'completed';
+        allow update, delete: if false; // Reviews are immutable.
+      }
+
+      match /bookings/{bookingId} {
+        allow get: if isCarWashOwner(carWashId) || isOwner(resource.data.clientId);
+        allow list: if isCarWashOwner(carWashId);
+        allow create: if isClient() && request.resource.data.clientId == request.auth.uid;
+        allow update: if isCarWashOwner(carWashId) || isOwner(resource.data.clientId);
+        allow delete: if isCarWashOwner(carWashId) || isOwner(resource.data.clientId);
+      }
     }
   }
 }
