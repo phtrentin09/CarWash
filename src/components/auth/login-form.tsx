@@ -13,12 +13,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { loginSchema, type LoginInput } from '@/lib/auth-actions';
-import { loginUser } from '@/lib/auth-actions';
 import { useState, useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+
+// ⭐ IMPORTA O LOGIN REAL DO FIREBASE
+import { login } from '@/services';
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition();
@@ -35,24 +36,27 @@ export function LoginForm() {
 
   const onSubmit = (values: LoginInput) => {
     startTransition(async () => {
-      const result = await loginUser(values);
-      if (result.success && result.role) {
+      try {
+        // ⭐ LOGIN REAL COM FIREBASE
+        const user = await login(values.email, values.password);
+
         toast({
           title: 'Login bem-sucedido!',
           description: 'Você será redirecionado em breve.',
         });
-        // Redirect to role-specific dashboard
-        const redirectPath = result.role === 'owner' ? '/owner/dashboard' : '/dashboard';
-        router.push(redirectPath);
-      } else {
+
+        // Aqui você pode adaptar conforme sua role real
+        router.push('/dashboard');
+      } catch (error: any) {
         form.setError('root', {
           type: 'manual',
-          message: result.error || 'Falha no login',
+          message: error.message || 'Falha no login',
         });
+
         toast({
           variant: 'destructive',
           title: 'Erro no login',
-          description: result.error || 'Verifique suas credenciais.',
+          description: error.message || 'Verifique suas credenciais.',
         });
       }
     });
@@ -110,3 +114,4 @@ export function LoginForm() {
     </Form>
   );
 }
+
