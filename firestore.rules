@@ -36,11 +36,19 @@ service cloud.firestore {
     // - Only the owner of the car wash can update it.
     // - A user with the 'owner' role can create a new car wash.
     match /carWashes/{carWashId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isRole('owner') && request.resource.data.ownerId == request.auth.uid;
       allow update: if isCarWashOwner(carWashId);
       // Deletion can be handled by admins or owners.
       allow delete: if isCarWashOwner(carWashId) || isRole('admin');
+    }
+
+    // Reviews stored as subcollections under /carWashes/{carWashId}/reviews.
+    match /carWashes/{carWashId}/reviews/{reviewId} {
+      allow get, list: if true;
+      allow create: if isOwner(request.resource.data.clientId);
+      allow update: if isOwner(resource.data.clientId);
+      allow delete: if isOwner(resource.data.clientId) || isRole('admin');
     }
 
     // Bookings Collection
