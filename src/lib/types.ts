@@ -1,5 +1,40 @@
 import { Timestamp } from "firebase/firestore";
+import * as z from "zod"; // 1. Certifique-se de importar o zod
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
+// 2. O schema PRECISA ser um z.object
+const registerSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  role: z.enum(["client", "business", "owner", "admin"]), // Use os roles que definimos na interface!
+});
+
+// 3. Opcional: extrair o tipo do schema
+type RegisterInput = z.infer<typeof registerSchema>;
+
+// Dentro do seu componente:
+const form = useForm<RegisterInput>({
+  resolver: zodResolver(registerSchema), // Agora ele vai reconhecer como um Zod Schema
+  defaultValues: {
+    name: '',
+    email: '',
+    password: '',
+    role: 'client',
+  },
+});
+
+const schema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  // ... resto do seu schema
+});
+
+// No componente:
+const { register, handleSubmit, formState: { errors } } = useForm({
+  resolver: zodResolver(schema), // Certifique-se que o schema é passado aqui
+});
 // 🔥 Unificado: AppUser e User agora são uma só estrutura
 export interface User {
   uid: string;
