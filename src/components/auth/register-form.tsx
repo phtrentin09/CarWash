@@ -21,6 +21,8 @@ import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { register } from "@/services";
+
 import {
   Select,
   SelectContent,
