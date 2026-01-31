@@ -14,10 +14,10 @@ import Link from 'next/link';
 
 export default function CarWashDetails({ carWashId }: { carWashId: string }) {
   const { firestore } = useFirebase();
-   const carWashRef = useMemoFirebase(() => firestore ? doc(firestore, 'car_washes', carWashId) : null, [firestore, carWashId]);
+  const carWashRef = useMemoFirebase(() => firestore ? doc(firestore, 'car_washes', carWashId) : null, [firestore, carWashId]);
   const { data: carWash, isLoading: isLoadingCarWash } = useDoc<CarWash>(carWashRef);
   
-   const reviewsQuery = useMemoFirebase(
+  const reviewsQuery = useMemoFirebase(
     () => firestore ? query(collection(firestore, 'car_washes', carWashId, 'reviews'), orderBy('createdAt', 'desc')) : null,
     [firestore, carWashId]
   );

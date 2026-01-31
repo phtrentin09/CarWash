@@ -67,7 +67,7 @@ export function ClientDashboard() {
   const t = translations[language];
 
   const { firestore } = useFirebase();
-    const carWashesQuery = useMemoFirebase(() => firestore ? collection(firestore, 'car_washes') : null, [firestore]);
+  const carWashesQuery = useMemoFirebase(() => firestore ? collection(firestore, 'car_washes') : null, [firestore]);
   const { data: carWashesData, isLoading, error: firestoreError } = useCollection<CarWash>(carWashesQuery);
 
   const [location, setLocation] = useState<{

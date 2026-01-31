@@ -12,7 +12,7 @@ service cloud.firestore {
     }
     
     function isRole(role) {
-         return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
     }
 
     function isClient() {
@@ -35,24 +35,16 @@ service cloud.firestore {
       allow list, delete: if false;
     }
 
-   // Car Washes Collection (car_washes)
+    // Car Washes Collection (car_washes)
     // - Anyone can read car wash listings.
     // - Only the owner of the car wash can update it.
-     match /car_washes/{carWashId} {
+    match /car_washes/{carWashId} {
       allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update: if isCarWashOwner(carWashId);
       allow delete: if false; // Soft deletes should be used.
 
-    // Reviews stored as subcollections under /carWashes/{carWashId}/reviews.
-    match /carWashes/{carWashId}/reviews/{reviewId} {
-      allow get, list: if true;
-      allow create: if isOwner(request.resource.data.clientId);
-      allow update: if isOwner(resource.data.clientId);
-      allow delete: if isOwner(resource.data.clientId) || isRole('admin');
-    }
-
-   match /reviews/{reviewId} {
+      match /reviews/{reviewId} {
         allow get, list: if true;
         allow create: if isClient() &&
           exists(/databases/$(database)/documents/car_washes/$(carWashId)/bookings/$(request.resource.data.bookingId)) &&

@@ -53,7 +53,7 @@ export default function BookingForm({ carWashId }: { carWashId: string }) {
   const { toast } = useToast();
   const router = useRouter();
 
-   const carWashRef = useMemoFirebase(() => firestore ? doc(firestore, 'car_washes', carWashId) : null, [firestore, carWashId]);
+  const carWashRef = useMemoFirebase(() => firestore ? doc(firestore, 'car_washes', carWashId) : null, [firestore, carWashId]);
   const { data: carWash, isLoading: isLoadingCarWash } = useDoc<CarWash>(carWashRef);
   
   const form = useForm<BookingFormValues>({
@@ -76,7 +76,7 @@ export default function BookingForm({ carWashId }: { carWashId: string }) {
             status: 'pending',
             createdAt: serverTimestamp(),
         }
-       await addDoc(collection(firestore, 'car_washes', carWashId, 'bookings'), bookingData);
+        await addDoc(collection(firestore, 'car_washes', carWashId, 'bookings'), bookingData);
         toast({
             title: 'Agendamento solicitado!',
             description: 'Aguarde a confirmação do lava-rápido.'
