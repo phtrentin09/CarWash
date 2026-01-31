@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Form,
   FormControl,
@@ -10,18 +11,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  registerSchema,
-  type RegisterInput,
-  registerUser,
-} from '@/lib/auth-actions';
+
+import { registerSchema, type RegisterInput } from '@/lib/auth-actions';
+
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { register } from "@/services";
+
+// 👉 serviço REAL do Firebase Auth + Firestore
+import { register as registerService } from "@/services/auth";
 
 import {
   Select,
@@ -48,18 +50,29 @@ export function RegisterForm() {
 
   const onSubmit = (values: RegisterInput) => {
     startTransition(async () => {
-      const result = await registerUser(values);
-      if (result.success) {
-        toast({
-          title: 'Conta criada com sucesso!',
-          description: 'Você será redirecionado para o login.',
-        });
-        router.push('/auth/login');
-      } else {
+      try {
+        const result = await registerService(values);
+
+        if (result.success) {
+          toast({
+            title: 'Conta criada com sucesso!',
+            description: 'Você será redirecionado para o login.',
+          });
+
+          router.push('/auth/login');
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Erro no cadastro',
+            description: result.error || 'Não foi possível criar sua conta.',
+          });
+        }
+
+      } catch (err: any) {
         toast({
           variant: 'destructive',
-          title: 'Erro no cadastro',
-          description: result.error,
+          title: 'Erro inesperado',
+          description: err?.message || 'Tente novamente mais tarde.',
         });
       }
     });
@@ -68,6 +81,7 @@ export function RegisterForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
         <FormField
           control={form.control}
           name="name"
@@ -81,6 +95,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="email"
@@ -99,6 +114,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="password"
@@ -117,6 +133,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="role"
@@ -129,6 +146,7 @@ export function RegisterForm() {
                     <SelectValue placeholder="Selecione seu tipo de conta" />
                   </SelectTrigger>
                 </FormControl>
+
                 <SelectContent>
                   <SelectItem value="client">Cliente</SelectItem>
                   <SelectItem value="owner">Dono de Lava-Rápido</SelectItem>
@@ -138,6 +156,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
+
         <Button type="submit" className="w-full" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Criar Conta
@@ -146,3 +165,4 @@ export function RegisterForm() {
     </Form>
   );
 }
+
