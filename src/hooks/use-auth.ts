@@ -1,15 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut as firebaseSignOut } from 'firebase/auth';
 import { useFirebase } from '@/firebase/provider';
-import { doc } from 'firebase/firestore';
-import { useDoc } from '@/firebase/firestore/use-doc';
+import { doc, getDoc } from 'firebase/firestore';
 import { User as AppUser } from '@/lib/types';
 
-// Extend the AppUser to include firebase-auth fields
-export type AuthenticatedUser = AppUser & {
+export type AuthenticatedUser = Omit<AppUser, 'email'> & {
+  uid: string;
+  email: string | null;
   emailVerified: boolean;
   photoURL: string | null;
 };
@@ -18,42 +18,66 @@ export function useAuth() {
   const { auth, firestore, user: firebaseUser, isUserLoading, userError } = useFirebase();
   const router = useRouter();
 
-  // Build a reference to the user document in Firestore
-  const userDocRef = useMemo(() => {
-    if (!firestore || !firebaseUser) return null;
-    return doc(firestore, 'users', firebaseUser.uid);
+  const [userProfile, setUserProfile] = useState<AppUser | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+
+  // Load Firestore user profile
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!firestore || !firebaseUser) {
+        setUserProfile(null);
+        setIsProfileLoading(false);
+        return;
+      }
+
+      try {
+        const ref = doc(firestore, 'users', firebaseUser.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setUserProfile(snap.data() as AppUser);
+        } else {
+          setUserProfile(null);
+        }
+      } catch (err) {
+        console.error('Error loading user profile:', err);
+        setUserProfile(null);
+      } finally {
+        setIsProfileLoading(false);
+      }
+    }
+
+    fetchProfile();
   }, [firestore, firebaseUser]);
 
-  // Load user profile from Firestore
-  const { data: userProfile, isLoading: isProfileLoading } = useDoc<AppUser>(userDocRef);
-
-  // SignOut handler
   const signOut = async () => {
-    if (auth) {
-      await firebaseSignOut(auth);
-      router.push('/');
-    }
+    await firebaseSignOut(auth);
+    router.push('/');
   };
 
-  // Merge Firebase Auth + Firestore profile cleanly
-  const user = useMemo(() => {
+  const mergedUser: AuthenticatedUser | null = useMemo(() => {
     if (!firebaseUser || !userProfile) return null;
 
+    // Remove uid do profile (se existir) para evitar conflito
+    const { uid: _removedUid, ...cleanProfile } = userProfile;
+
     return {
-      ...userProfile, // Firestore fields first
-      uid: firebaseUser.uid, // Firebase uid ALWAYS wins
-      email: firebaseUser.email,
+      ...cleanProfile,
+      uid: firebaseUser.uid,
+      email: firebaseUser.email ?? null, // <- garante tipo correto
       emailVerified: firebaseUser.emailVerified,
       photoURL: firebaseUser.photoURL,
-    } as AuthenticatedUser;
+    };
   }, [firebaseUser, userProfile]);
 
   return {
-    user,
+    user: mergedUser,
+    isAuthenticated: !!mergedUser,
     loading: isUserLoading || isProfileLoading,
     error: userError,
-    isAuthenticated: !!user,
     signOut,
   };
 }
+
+
 
