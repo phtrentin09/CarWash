@@ -1,6 +1,4 @@
-'use server';
-
-import { z } from 'zod';
+import type { RegisterInput, LoginInput } from '@/lib/auth-schemas';
 import { initializeFirebase } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -8,17 +6,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
-// Zod schema for registration
-export const registerSchema = z.object({
-  name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
-  email: z.string().email('E-mail inválido.'),
-  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.'),
-  role: z.enum(['client', 'owner'], {
-    required_error: 'Você deve selecionar uma função.',
-  }),
-});
 
-export type RegisterInput = z.infer<typeof registerSchema>;
 
 export async function registerUser(values: RegisterInput) {
   'use server';
@@ -55,13 +43,6 @@ export async function registerUser(values: RegisterInput) {
   }
 }
 
-// Zod schema for login
-export const loginSchema = z.object({
-  email: z.string().email('E-mail inválido.'),
-  password: z.string().min(1, 'A senha é obrigatória.'),
-});
-
-export type LoginInput = z.infer<typeof loginSchema>;
 
 export async function loginUser(values: LoginInput) {
   'use server';

@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-import { registerSchema, type RegisterInput } from '@/lib/auth-actions';
+import { registerSchema, type RegisterInput } from '@/lib/auth-schemas';
 
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';

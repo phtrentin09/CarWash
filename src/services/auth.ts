@@ -2,7 +2,7 @@ import { initializeFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-import type { RegisterInput } from '@/lib/auth-actions';
+import type { RegisterInput } from '@/lib/auth-schemas';
 
 export async function register(values: RegisterInput) {
   try {
